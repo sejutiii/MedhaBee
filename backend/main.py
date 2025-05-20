@@ -1,21 +1,24 @@
-import os
 from fastapi import FastAPI
-from pymongo import MongoClient
-from dotenv import load_dotenv
-
-# Load environment variables from .env file
-load_dotenv()
-
-MONGODB_URI = os.getenv("MONGODB_URI")
+from fastapi.middleware.cors import CORSMiddleware
+from app.config.database import get_database
+from app.api.auth import router as auth_router
 
 app = FastAPI()
 
-# Connect to MongoDB
-client = MongoClient(MONGODB_URI)
-db = client.get_default_database()
+# Add CORS middleware for frontend communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include authentication routes
+app.include_router(auth_router)
 
 @app.get("/")
 def read_root():
-    # Example: return the list of collections in the database
+    db = get_database()
     collections = db.list_collection_names()
     return {"message": "Connected to MongoDB!", "collections": collections}
