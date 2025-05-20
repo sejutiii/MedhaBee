@@ -7,6 +7,9 @@ import os
 load_dotenv()
 
 CLERK_PEM = os.getenv("CLERK_PEM")
+if CLERK_PEM and "\\n" in CLERK_PEM:
+    CLERK_PEM = CLERK_PEM.replace("\\n", "\n")
+
 security = HTTPBearer()
 
 async def verify_clerk_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -17,5 +20,6 @@ async def verify_clerk_token(credentials: HTTPAuthorizationCredentials = Depends
         if not user_id:
             raise HTTPException(status_code=401, detail="Invalid token")
         return user_id
-    except JWTError:
+    except JWTError as e:
+        print("JWTError:", e)
         raise HTTPException(status_code=401, detail="Invalid token")
