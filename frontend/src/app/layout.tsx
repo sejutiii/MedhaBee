@@ -7,7 +7,7 @@ import {
 } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from 'next/font/google'
 import './globals.css'
-import SignOutButton from './SignOutButton'
+import SignOutButton from '../components/SignOutButton'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
