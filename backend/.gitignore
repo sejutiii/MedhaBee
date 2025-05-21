@@ -1,3 +1,2 @@
-__pychache__/
-*.py[cod]
 venv/
+__pycache__/
