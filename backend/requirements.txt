@@ -3,3 +3,6 @@ uvicorn
 pymongo 
 python-dotenv
 python-jose[cryptography]
+google-generativeai
+google-api-python-client 
+requests
