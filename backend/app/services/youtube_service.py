@@ -34,7 +34,7 @@ async def search_youtube_videos(query: str) -> list:
             part="snippet",
             q=query + " science",
             type="video",
-            maxResults=10
+            maxResults=5  # Reduced from 10 to 5 to save quota
         ).execute()
 
         video_ids = [item["id"]["videoId"] for item in search_response.get("items", [])]
