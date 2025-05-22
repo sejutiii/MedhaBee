@@ -47,7 +47,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <div className="absolute top-4 right-4">
-        {isSignedIn && <UserButton aria-label="User profile and sign out" />}
       </div>
       <h1 className="text-3xl font-bold mb-4 text-gray-800">MedhaBee Dashboard</h1>
       {isSignedIn ? (
