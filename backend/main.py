@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from app.config.database import get_database
 from app.api.auth import router as auth_router
 from app.api.chatbot import router as chatbot_router
+from app.api.tts import router as tts_router
+from app.api.stt import router as stt_router
 
 app = FastAPI()
 
@@ -15,9 +18,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/static", StaticFiles(directory="."), name="static")
+
 # Include authentication routes
 app.include_router(auth_router)
 app.include_router(chatbot_router) 
+app.include_router(tts_router)
+app.include_router(stt_router)
 
 @app.get("/")
 def read_root():
