@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import VideoPlayer from "@/components/VideoPlayer";
 
 // Categories with their description and icon
 const categories = [
@@ -246,6 +248,11 @@ export default function VideosPage() {
     useState<CategoryKey>("biology");
   const [searchQuery, setSearchQuery] = useState("");
   const [simplifiedMode, setSimplifiedMode] = useState(false);
+  const [selectedVideo, setSelectedVideo] = useState<{
+    id: string;
+    title: string;
+    videoUrl: string;
+  } | null>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -531,24 +538,76 @@ export default function VideosPage() {
           </div>
         </div>
 
+        {/* Video Player Modal (when a video is selected) */}
+        {selectedVideo && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-90"
+            onClick={() => setSelectedVideo(null)} // Close when clicking outside
+          >
+            <div
+              className="w-full max-w-5xl max-h-[90vh] bg-gray-900 rounded-xl overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+            >
+              <div className="relative h-0 pb-[56.25%]">
+                <VideoPlayer
+                  videoUrl={selectedVideo.videoUrl}
+                  title={selectedVideo.title}
+                  onClose={() => setSelectedVideo(null)}
+                />
+              </div>
+              <div className="p-4 bg-gray-900 text-white flex justify-between items-center">
+                <h3 className="text-lg font-medium truncate mr-4">
+                  {selectedVideo.title}
+                </h3>
+                <div className="flex items-center space-x-2">
+                  <a
+                    href={selectedVideo.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 text-xs bg-gray-800 hover:bg-gray-700 text-white rounded-md"
+                  >
+                    Open on YouTube
+                  </a>
+                  <button
+                    onClick={() => setSelectedVideo(null)}
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-xs"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Video Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
           {videosByCategory[selectedCategory].map((video) => (
-            <a
+            <div
               key={video.id}
-              href={video.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+              className="block group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+              onClick={() =>
+                setSelectedVideo({
+                  id: video.id,
+                  title: video.title,
+                  videoUrl: video.videoUrl,
+                })
+              }
             >
               {/* Thumbnail */}
               <div className="relative">
-                {/* Next.js warns about using img instead of Image, but we'll keep it for now */}
-                <img
-                  src={video.thumbnail}
-                  alt={video.title}
-                  className="w-full h-52 object-cover"
-                />
+                <div className="relative w-full h-52">
+                  <Image
+                    src={video.thumbnail}
+                    alt={video.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={
+                      video.id === videosByCategory[selectedCategory][0].id
+                    }
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="absolute bottom-3 right-3 bg-black bg-opacity-80 text-white px-2.5 py-1 text-xs font-medium rounded-md">
                   {video.duration}
@@ -570,6 +629,25 @@ export default function VideosPage() {
                       ? "Simplified"
                       : video.category || selectedCategory}
                   </span>
+                </div>
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-14 h-14 bg-blue-600 bg-opacity-90 rounded-full flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
 
@@ -599,12 +677,12 @@ export default function VideosPage() {
                         d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
                       />
                     </svg>
-                    Watch on YouTube
+                    Watch Now
                   </div>
 
                   <button
                     onClick={(e) => {
-                      e.preventDefault();
+                      e.stopPropagation(); // Prevent triggering the parent onClick
                       setSimplifiedMode(true);
                       window.open(
                         `https://www.youtube.com/results?search_query=${encodeURIComponent(
@@ -634,7 +712,7 @@ export default function VideosPage() {
 
                   <button
                     onClick={(e) => {
-                      e.preventDefault();
+                      e.stopPropagation(); // Prevent triggering the parent onClick
                       window.open(
                         `/chatbot?topic=${encodeURIComponent(video.title)}`,
                         "_blank"
@@ -660,7 +738,7 @@ export default function VideosPage() {
                   </button>
                 </div>
               </div>
-            </a>
+            </div>
           ))}
         </div>
 
