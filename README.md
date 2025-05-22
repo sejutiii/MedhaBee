@@ -1,65 +1,99 @@
 # MedhaBee - Inclusive Science Education Platform
 
-## Team
-Sejuti Sharmin Siddiqui, Farhan Tausif, Mahdiya Rahman Sukanya
+
+MedhaBee is a web-based platform designed to make science education accessible and inclusive for all, particularly in Bangladesh. By addressing language barriers, literacy gaps, and accessibility challenges, MedhaBee empowers learners with curiosity to explore science through AI-powered tools, multimedia content, and inclusive design.
+
+
+## Introduction
+Learning should be open to all, regardless of language, literacy, or physical abilities. MedhaBee enables anyone with curiosity to learn science by offering:
+- **AI-powered translation and simplification** in Bangla and English.
+- **Accessible interfaces** for users with visual or auditory impairments.
+- **Interactive content** like videos, daily facts, and quizzes to foster critical thinking.
 
 ## Problem Addressed
-MedhaBee addresses two major challenges:
-- **Language and Literacy Gaps:** Most scientific resources in Bangladesh are in English, creating barriers for Bangla-speaking learners. MedhaBee provides multilingual, simplified content for varying literacy levels.
-- **Inclusivity for All:** The platform is designed for accessibility, supporting users with visual and auditory disabilities through screen reader compatibility and voice navigation.
+MedhaBee tackles two critical challenges in science education:
+- **Language and Literacy Gaps**: Most scientific resources in Bangladesh are in English, excluding Bangla-speaking learners. Varying literacy levels require simplified, multilingual content.
+- **Inclusivity for All**: Individuals with visual or auditory impairments are often excluded due to inaccessible platforms. MedhaBee ensures equal access through screen reader compatibility and voice navigation.
 
 ## Solution Overview
-MedhaBee is an AI-powered, accessible science education platform that:
-- Translates and simplifies scientific content into Bangla and English using the Gemini API.
-- Offers multimedia learning with categorized YouTube videos.
-- Provides interactive daily facts and quizzes.
-- Ensures accessibility with screen reader optimization and voice navigation.
+MedhaBee is an innovative platform that:
+- **Translates and simplifies** scientific content into Bangla and English using the Gemini API.
+- **Provides multimedia learning** with categorized YouTube videos (Biology, Physics, Chemistry, Medicine).
+- **Offers interactive content** with curated "Did You Know?" facts and quizzes.
+- **Ensures accessibility** with screen reader optimization, voice navigation.
 
 ## Key Features
 
 ### 1. Authentication System
-- **Registered Users:**
-  - Save preferences and progress.
+- **Registered Users**:
+  - Save preferences and progress for a personalized experience.
   - Access AI chatbot, video library, daily facts, and quizzes.
-- **Guest Mode:**
-  - Access only the AI chatbot (with voice/text input).
+- **Guest Mode**:
+  - Access only the AI chatbot, supporting text and voice input for scientific queries.
 
 ### 2. AI-Powered Chatbot
-- Gemini API integration for English and Bangla queries.
-- Simplify/Advance modes for different literacy levels.
-- Text-to-Speech (TTS) and Speech-to-Text (STT) for accessibility.
+- Integrated with the **Gemini API** for Bangla and English queries.
+- **Simplify/Advance modes** to tailor responses to literacy levels.
+- **Text-to-Speech (TTS)** and **Speech-to-Text (STT)** for enhanced accessibility.
 
 ### 3. Video Player Interface
-- Fetches and categorizes YouTube science videos (Biology, Physics, Chemistry, Medicine).
+- Fetches YouTube videos, categorized by science topics (Biology, Physics, Chemistry, Medicine).
+- Simplified mode for beginner-friendly content.
 
 ### 4. Curated Daily Content
-- "Did You Know?" facts by category.
-- Quizzes after every 10 facts.
-- Low-bandwidth design for rural accessibility.
+- Tailored "Did You Know?" facts based on user-selected categories.
+- Quizzes after every 10 facts to reinforce learning.
+- Optimized for low-bandwidth environments.
 
 ### 5. Accessibility Features
-- Screen reader optimization (ARIA labels, alt-text).
-- Voice navigation for hands-free control.
+- **Screen reader optimization** with ARIA labels and alt-text.
+- **Voice navigation** (e.g., "Hey MedhaBee, simplify this") for hands-free control.
+- Supports Bangla and English voice commands and audio responses.
 
 ## Technology Stack
-- **Frontend:** Next.js, React, Tailwind CSS
-- **Backend:** FastAPI, Node.js
-- **APIs:** Gemini API, YouTube API, Azure Speech API
+- **Frontend**: Next.js, React, Tailwind CSS
+- **Backend**: FastAPI, Node.js, MongoDB Atlas
+- **APIs**:
+  - Gemini API (chatbot)
+  - YouTube API (video content)
+  - Azure Speech API (TTS/STT)
+- **Deployment**: Vercel (planned for scalable hosting)
+- **Accessibility**: WCAG-compliant with ARIA labels
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (for frontend)
-- Python 3.10+ (for backend)
+- **Node.js** (v16+ for frontend)
+- **Python** (3.10+ for backend)
+- **FFmpeg** (for audio processing with Azure Speech API)
+- **MongoDB Atlas** account (for database)
+
+#### Install FFmpeg
+- **Ubuntu/Debian**:
+  ```bash
+  sudo apt update
+  sudo apt install ffmpeg
+  ```
+- **macOS** (with Homebrew):
+  ```bash
+  brew install ffmpeg
+  ```
+- **Windows**:
+  Download from [FFmpeg website](https://ffmpeg.org/download.html) and add to PATH.
 
 ### 1. Clone the Repository
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/your-repo/MedhaBee.git
 cd MedhaBee
 ```
 
-### 2. Setup Environment Variables
-- Copy `.env.example` files in both `frontend/` and `backend/` to `.env` and fill in your credentials.
+### 2. Set Up Environment Variables
+- Copy `.env.example` to `.env` in both `frontend/` and `backend/` directories.
+- Fill in credentials for:
+  - Gemini API key
+  - YouTube API key
+  - Azure Speech API key
+  - MongoDB Atlas connection string
 
 ### 3. Install Dependencies
 #### Frontend
@@ -91,16 +125,47 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Folder Structure
 ```
 MedhaBee/
-  backend/      # FastAPI backend
-  frontend/     # Next.js frontend
+├── backend/         # FastAPI backend, MongoDB integration
+├── frontend/        # Next.js frontend with React and Tailwind CSS
+├── docs/           # Project documentation
+└── README.md       # This file
 ```
 
 ## Environment Variables
-See `.env.example` files in both `frontend/` and `backend/` for required variables.
+Refer to `.env.example` in `frontend/` and `backend/` for required variables, including:
+- `GEMINI_API_KEY`
+- `YOUTUBE_API_KEY`
+- `AZURE_SPEECH_KEY`
+- `MONGODB_URI`
 
 ## Impact and Future Scope
-- **Impact:** Makes science education accessible to non-English speakers and users with disabilities. Fosters critical thinking and combats misinformation.
-- **Future Scope:**
-  - Offline-first capabilities for low-connectivity areas.
-  - Augmented reality (AR) for interactive learning.
-  - Mobile app for broader accessibility.
+### Impact
+- **Accessibility**: Delivers Bangla and English content, simplified for diverse literacy levels.
+- **Inclusivity**: Enables users with visual/auditory impairments to engage fully.
+- **Scientific Literacy**: Curated facts and quizzes promote critical thinking and combat misinformation.
+
+### Future Scope
+- Implement **offline-first capabilities** for zero-connectivity regions.
+- Integrate **augmented reality (AR)** for interactive science visualizations.
+- Develop a **mobile app** to enhance accessibility.
+- Expand language support to other regional dialects (e.g., Hindi, Tamil).
+- Partner with schools to integrate MedhaBee into curricula.
+
+## Contributing
+We welcome contributions! Please follow these steps:
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/your-feature`).
+3. Commit changes (`git commit -m "Add your feature"`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Open a Pull Request.
+
+
+## Team
+- **Sejuti Sharmin Siddiqui** - The University of Dhaka
+- **Farhan Tausif** - The University of Dhaka
+- **Mahdiya Rahman Sukanya** - The University of Dhaka
+
+## Acknowledgments
+- **BRAC-Biggan Adda** for hosting the 1st SN Bose National Science Festival 2025 IT Hackathon.
+- **The University of Dhaka** for supporting our team.
+- Built with ❤️ by **Status_Code 418**.
