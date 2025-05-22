@@ -39,6 +39,9 @@ export default function ChatbotPage() {
   const [isBotTyping, setIsBotTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [recordingError, setRecordingError] = useState<string | null>(null);
+  const [ttsError, setTtsError] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const recorderRef = useRef<any>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -204,6 +207,46 @@ export default function ChatbotPage() {
     }
   };
 
+  // Generate TTS and display audio player
+  const handlePlayTTS = async () => {
+    const lastBotMsg = [...chatHistory]
+      .reverse()
+      .find((msg) => msg.sender === "bot");
+    if (!lastBotMsg) {
+      setTtsError("No bot response to play.");
+      return;
+    }
+
+    setTtsError(null);
+    setAudioUrl(null);
+    setIsGeneratingAudio(true);
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: lastBotMsg.content,
+          language: language,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      const audioUrl = `${process.env.NEXT_PUBLIC_API_URL}${result.audio_url}`;
+      setAudioUrl(audioUrl);
+    } catch (err: any) {
+      setTtsError("Failed to generate audio: " + (err instanceof Error ? err.message : String(err)));
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
+
   // Simplify last user message
   const handleSimplify = async () => {
     const lastUserMsg = [...chatHistory]
@@ -358,7 +401,7 @@ export default function ChatbotPage() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center bg-gray-50 p-1 rounded-full shadow-sm">
                 <button
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
                     language === "en"
                       ? "bg-white text-blue-600 shadow-sm"
                       : "text-gray-600"
@@ -368,7 +411,7 @@ export default function ChatbotPage() {
                   English
                 </button>
                 <button
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
+                  className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors duration-200 ${
                     language === "bn"
                       ? "bg-white text-blue-600 shadow-sm"
                       : "text-gray-600"
@@ -555,12 +598,57 @@ export default function ChatbotPage() {
               </button>
             </form>
 
-            {/* Error Display */}
-            {recordingError && (
-              <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
-                <strong>Error:</strong> {recordingError}
-              </div>
-            )}
+            {/* Error Displays and Audio Playback */}
+            <div className="mt-4 space-y-2">
+              {(recordingError || ttsError) && (
+                <>
+                  {recordingError && (
+                    <div className="p-4 bg-red-100 text-red-800 rounded">
+                      <strong>Error:</strong> {recordingError}
+                    </div>
+                  )}
+                  {ttsError && (
+                    <div className="p-4 bg-red-100 text-red-800 rounded">
+                      <strong>Error:</strong> {ttsError}
+                    </div>
+                  )}
+                </>
+              )}
+              {isGeneratingAudio && (
+                <div className="p-4 bg-blue-100 text-blue-800 rounded flex items-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2 text-blue-600"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Generating Audio...
+                </div>
+              )}
+              {audioUrl && !isGeneratingAudio && (
+                <div className="p-4 bg-green-100 text-green-800 rounded">
+                  <p className="mb-2 font-medium">Audio Generated:</p>
+                  <audio controls className="w-full">
+                    <source src={audioUrl} type="audio/wav" />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              )}
+            </div>
 
             {/* Action Buttons */}
             <div className="flex mt-4 space-x-3">
@@ -605,6 +693,27 @@ export default function ChatbotPage() {
                   />
                 </svg>
                 Ask More About This Topic
+              </button>
+              <button
+                className="flex items-center justify-center px-4 py-3 text-sm rounded-xl bg-purple-50 text-purple-700 hover:bg-purple-100 transition-all shadow-sm"
+                onClick={handlePlayTTS}
+                disabled={isBotTyping || chatHistory.length === 0 || !chatHistory.some((msg) => msg.sender === "bot")}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 mr-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                  />
+                </svg>
+                Listen to Response
               </button>
             </div>
           </div>
