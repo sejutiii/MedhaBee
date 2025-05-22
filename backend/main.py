@@ -6,6 +6,7 @@ from app.api.auth import router as auth_router
 from app.api.chatbot import router as chatbot_router
 from app.api.tts import router as tts_router
 from app.api.stt import router as stt_router
+from app.api.youtube import router as youtube_router
 
 app = FastAPI()
 
@@ -25,6 +26,7 @@ app.include_router(auth_router)
 app.include_router(chatbot_router) 
 app.include_router(tts_router)
 app.include_router(stt_router)
+app.include_router(youtube_router)
 
 @app.get("/")
 def read_root():
