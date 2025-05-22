@@ -10,6 +10,9 @@ import {
 } from "@/services/chatService";
 import ReactMarkdown from "react-markdown";
 
+// @ts-ignore
+let Recorder: any = null;
+
 // Define chat message type
 type Message = {
   id: string;
@@ -35,7 +38,11 @@ export default function ChatbotPage() {
   const [isListening, setIsListening] = useState(false);
   const [isBotTyping, setIsBotTyping] = useState(false);
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
+  const [recordingError, setRecordingError] = useState<string | null>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const recorderRef = useRef<any>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   // Function to handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,18 +97,111 @@ export default function ChatbotPage() {
     }
   }, [chatHistory, isBotTyping]);
 
-  // Voice recognition simulation
-  const handleVoiceCommand = () => {
+  // Start recording audio for STT
+  const startRecording = async () => {
+    setRecordingError(null);
     setIsListening(true);
 
-    // Simulate voice recognition
-    setTimeout(() => {
-      // Choose a random topic from the list
-      const randomTopic =
-        scienceTopics[Math.floor(Math.random() * scienceTopics.length)];
-      setMessage(randomTopic);
+    try {
+      // Dynamically load Recorder.js if not loaded
+      if (!Recorder) {
+        await new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = '/recorder.js';
+          script.onload = resolve;
+          script.onerror = reject;
+          document.body.appendChild(script);
+        });
+        // @ts-ignore
+        Recorder = window.Recorder;
+      }
+
+      // Get microphone access
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+
+      // Create audio context and recorder
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 16000 });
+      audioContextRef.current = audioContext;
+      const input = audioContext.createMediaStreamSource(stream);
+
+      // Configure recorder for Azure Speech API requirements
+      const recorder = new Recorder(input, {
+        workerPath: '/recorderWorker.js',
+        numChannels: 1,
+        sampleRate: 16000,
+        bufferLen: 4096,
+      });
+      recorderRef.current = recorder;
+
+      // Start recording
+      recorder.record();
+      console.log("Recording started for STT");
+    } catch (err: any) {
+      setRecordingError("Failed to access microphone: " + (err instanceof Error ? err.message : String(err)));
       setIsListening(false);
-    }, 2000);
+    }
+  };
+
+  // Stop recording and transcribe audio
+  const stopRecording = async () => {
+    if (recorderRef.current) {
+      recorderRef.current.stop();
+
+      // Export the recorded audio as WAV and transcribe
+      recorderRef.current.exportWAV(async (blob: Blob) => {
+        console.log("Recording stopped, WAV blob created:", blob);
+
+        // Send audio file to backend for STT
+        try {
+          const formData = new FormData();
+          formData.append("audio", blob, "recorded-audio.wav");
+          formData.append("language", language);
+
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/stt`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          console.log("STT result:", result);
+          const transcribedText = result.text || "No transcription available";
+          setMessage(transcribedText); // Populate the input field with transcribed text
+        } catch (err: any) {
+          setRecordingError("Failed to transcribe audio: " + (err instanceof Error ? err.message : String(err)));
+        }
+      });
+
+      recorderRef.current.clear();
+      recorderRef.current = null;
+    }
+
+    // Clean up media stream
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+      streamRef.current = null;
+    }
+
+    // Clean up audio context
+    if (audioContextRef.current) {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+
+    setIsListening(false);
+  };
+
+  // Handle voice command (toggle recording)
+  const handleVoiceCommand = () => {
+    if (isListening) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
   };
 
   // Simplify last user message
@@ -169,6 +269,22 @@ export default function ChatbotPage() {
       setIsBotTyping(false);
     }
   };
+
+  // Clean up on component unmount
+  useEffect(() => {
+    return () => {
+      if (recorderRef.current) {
+        recorderRef.current.stop();
+        recorderRef.current.clear();
+      }
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+      }
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
@@ -421,7 +537,6 @@ export default function ChatbotPage() {
                   isListening ? "bg-red-600 animate-pulse" : "bg-green-600"
                 } text-white rounded-xl hover:bg-opacity-90 transition-colors shadow-sm`}
                 title="Use voice command"
-                disabled={isListening}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -439,6 +554,13 @@ export default function ChatbotPage() {
                 </svg>
               </button>
             </form>
+
+            {/* Error Display */}
+            {recordingError && (
+              <div className="mt-4 p-4 bg-red-100 text-red-800 rounded">
+                <strong>Error:</strong> {recordingError}
+              </div>
+            )}
 
             {/* Action Buttons */}
             <div className="flex mt-4 space-x-3">
