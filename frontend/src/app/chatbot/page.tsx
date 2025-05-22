@@ -141,20 +141,6 @@ export default function ChatbotPage() {
               </Link>
             </nav>
           </div>
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/login"
-              className="px-5 py-2 text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 font-medium text-sm transition-colors duration-200"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/signup"
-              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors duration-200"
-            >
-              Sign Up
-            </Link>
-          </div>
         </div>
       </header>
 
