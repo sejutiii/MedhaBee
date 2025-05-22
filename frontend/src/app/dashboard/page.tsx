@@ -85,8 +85,10 @@ export default function Dashboard() {
       <div className="absolute top-4 right-4">
         {/* <UserButton afterSignOutUrl="/" /> */}
       </div>
-      <h1 className="text-3xl font-bold mb-4 text-gray-800">MedhaBee Dashboard</h1>
-      {isSignedIn ? (
+      <h1 className="text-3xl font-bold mb-4 text-gray-800">
+        {isSignedIn ? "Welcome to Medhabee!" : "Guest Mode: No data will be saved."}
+      </h1>{isSignedIn ? (
+        
         <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
           <FeatureCard
             icon={<span role="img" aria-label="Chatbot">💬</span>}
@@ -118,7 +120,7 @@ export default function Dashboard() {
           </FeatureCard>
         </div>
       ) : (
-        <div className="w-full max-w-2xl flex flex-col items-center mt-8">
+        <div className="w-full max-w-4xl flex flex-col items-center mt-8">
           <FeatureCard
             icon={<span role="img" aria-label="Chatbot">💬</span>}
             title="Chatbot"
@@ -126,30 +128,29 @@ export default function Dashboard() {
           >
             <Link href="/chatbot" className="block mt-4 text-blue-600 hover:underline">Go to Chatbot</Link>
           </FeatureCard>
-          <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-            <div onClick={handleGuestFeatureClick} className="cursor-pointer">
+          <div className="w-full flex flex-row gap-8 mt-8">
+            <div onClick={handleGuestFeatureClick} className="cursor-pointer flex-1 min-w-0">
               <FeatureCard
                 icon={<span role="img" aria-label="Facts">💡</span>}
                 title="Daily Facts"
-                description="Sign Up to Access this feature ..."
+                description="Sign Up to Access this feature"
               />
             </div>
-            <div onClick={handleGuestFeatureClick} className="cursor-pointer">
-              <FeatureCard
-                icon={<span role="img" aria-label="Videos">🎬</span>}
-                title="Educational Videos"
-                description="Sign Up to Access this feature ..."
-              />
-            </div>
-            <div onClick={handleGuestFeatureClick} className="cursor-pointer">
+            <div onClick={handleGuestFeatureClick} className="cursor-pointer flex-1 min-w-0">
               <FeatureCard
                 icon={<span role="img" aria-label="Quiz">📝</span>}
                 title="Quiz"
-                description="Sign Up to Access this feature ..."
+                description="Sign Up to Access this feature"
+              />
+            </div>
+            <div onClick={handleGuestFeatureClick} className="cursor-pointer flex-1 min-w-0">
+              <FeatureCard
+                icon={<span role="img" aria-label="Videos">🎬</span>}
+                title="Educational Videos"
+                description="Sign Up to Access this feature"
               />
             </div>
           </div>
-          <p className="text-md text-gray-500 mt-6">Guest Mode: No data will be saved.</p>
         </div>
       )}
     </div>
