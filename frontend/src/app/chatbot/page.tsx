@@ -391,9 +391,7 @@ export default function ChatbotPage() {
         <div className="flex-1 bg-white rounded-xl shadow-lg p-6 mb-6 md:mb-0 md:mr-6 border border-gray-100">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-                Science Assistant
-              </h2>
+              
               <p className="text-gray-600 mt-1">
                 Ask questions and get clear, educational answers
               </p>
@@ -421,18 +419,7 @@ export default function ChatbotPage() {
                   বাংলা
                 </button>
               </div>
-              <div className="flex items-center">
-                <span className="text-sm text-gray-600 mr-2">Simplify</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={simplifiedMode}
-                    onChange={() => setSimplifiedMode(!simplifiedMode)}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
+            
             </div>
           </div>
 
