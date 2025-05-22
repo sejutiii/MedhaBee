@@ -1,9 +1,7 @@
-import { Accessibility, AudioLines, Languages } from "lucide-react";
+"use client";
+import { Accessibility, AudioLines, BotMessageSquareIcon, Languages } from "lucide-react";
 import FeatureCard from "@/components/ui/FeatureCard";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
-import SignInBtn from "./SignInButton";
-import SignUpBtn from "./SignUpButton";
-import GuestBtn from "./GuestButton";
+import Link from "next/link";
 
 export default function HomeContent() {
   return (
@@ -19,22 +17,18 @@ export default function HomeContent() {
             Learn without barriers - Supporting multiple languages, accessibility needs, 
             and diverse learning styles.
           </p>
-          
-          {/* <SignedOut>
-            <div className="flex justify-center gap-4 mt-8">
-              <SignInBtn />
-              <SignUpBtn />
-              <GuestBtn />
-            </div>
-          </SignedOut> */}
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
+          {/* Chatbot Section */}
+          <Link href="/chatbot">
           <FeatureCard 
-            icon={<Accessibility size={32} />}
-            title="Full Accessibility"
-            description="Screen reader optimized, voice commands, and adjustable interfaces"
-          />
+          icon={<BotMessageSquareIcon />}
+            title="AI-Powered Chatbot"
+            description="Ask questions and get clear, educational answers"
+            >
+          </FeatureCard>
+          </Link>
           <FeatureCard 
             icon={<AudioLines size={32} />}
             title="Multimodal Learning"
@@ -45,7 +39,13 @@ export default function HomeContent() {
             title="বাংলা/English Support"
             description="Learn in your preferred language"
           />
+          <FeatureCard 
+            icon={<Accessibility size={32} />}
+            title="Full Accessibility"
+            description="Screen reader optimized, voice commands, and adjustable interfaces"
+          />
         </div>
+
       </main>
     </div>
   );

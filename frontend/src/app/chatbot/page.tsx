@@ -1,8 +1,14 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  sendChatMessage,
+  sendSimplifiedMessage,
+  sendAdvancedMessage,
+} from "@/services/chatService";
+import ReactMarkdown from "react-markdown";
 
 // Define chat message type
 type Message = {
@@ -32,7 +38,7 @@ export default function ChatbotPage() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // Function to handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() === "") return;
 
@@ -43,27 +49,37 @@ export default function ChatbotPage() {
       sender: "user",
       timestamp: new Date(),
     };
-
     setChatHistory((prev) => [...prev, userMessage]);
     setMessage("");
-
-    // Simulate bot typing
     setIsBotTyping(true);
 
-    // Simulate bot response after a delay
-    setTimeout(() => {
+    try {
+      let botContent = "";
+      if (simplifiedMode) {
+        botContent = await sendSimplifiedMessage(userMessage.content, language);
+      } else {
+        botContent = await sendChatMessage(userMessage.content, language);
+      }
       const botResponse: Message = {
         id: (Date.now() + 1).toString(),
-        content: simplifiedMode
-          ? `Here's a simple explanation about ${message}...`
-          : `Let me explain ${message} in detail...`,
+        content: botContent,
         sender: "bot",
         timestamp: new Date(),
       };
-
       setChatHistory((prev) => [...prev, botResponse]);
+    } catch (err) {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 2).toString(),
+          content: "Sorry, I couldn't get a response. Please try again.",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
       setIsBotTyping(false);
-    }, 1500);
+    }
   };
 
   // Scroll to bottom of chat when history updates
@@ -86,6 +102,72 @@ export default function ChatbotPage() {
       setMessage(randomTopic);
       setIsListening(false);
     }, 2000);
+  };
+
+  // Simplify last user message
+  const handleSimplify = async () => {
+    const lastUserMsg = [...chatHistory]
+      .reverse()
+      .find((msg) => msg.sender === "user");
+    if (!lastUserMsg) return;
+    setIsBotTyping(true);
+    try {
+      const botContent = await sendSimplifiedMessage(lastUserMsg.content, language);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 3).toString(),
+          content: botContent,
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    } catch (err) {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 4).toString(),
+          content: "Sorry, I couldn't simplify the response.",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
+      setIsBotTyping(false);
+    }
+  };
+
+  // Advanced response for last user message
+  const handleAdvance = async () => {
+    const lastUserMsg = [...chatHistory]
+      .reverse()
+      .find((msg) => msg.sender === "user");
+    if (!lastUserMsg) return;
+    setIsBotTyping(true);
+    try {
+      const botContent = await sendAdvancedMessage(lastUserMsg.content, language);
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 5).toString(),
+          content: botContent,
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    } catch (err) {
+      setChatHistory((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 6).toString(),
+          content: "Sorry, I couldn't provide an advanced response.",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ]);
+    } finally {
+      setIsBotTyping(false);
+    }
   };
 
   return (
@@ -239,9 +321,7 @@ export default function ChatbotPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.3 }}
-                      className={`flex ${
-                        msg.sender === "user" ? "justify-end" : "justify-start"
-                      }`}
+                      className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
                     >
                       <div
                         className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
@@ -250,7 +330,13 @@ export default function ChatbotPage() {
                             : "bg-white border border-gray-200 rounded-bl-none"
                         }`}
                       >
-                        <p>{msg.content}</p>
+                        {msg.sender === "bot" ? (
+                          <div className="prose prose-blue max-w-none text-base">
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p>{msg.content}</p>
+                        )}
                         <p
                           className={`text-xs mt-1 text-right ${
                             msg.sender === "user"
@@ -358,7 +444,8 @@ export default function ChatbotPage() {
             <div className="flex mt-4 space-x-3">
               <button
                 className="flex-1 flex items-center justify-center px-4 py-3 text-sm rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all shadow-sm"
-                onClick={() => setSimplifiedMode(!simplifiedMode)}
+                onClick={handleSimplify}
+                disabled={isBotTyping || chatHistory.length === 0}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -376,7 +463,11 @@ export default function ChatbotPage() {
                 </svg>
                 Simplify This Topic
               </button>
-              <button className="flex-1 flex items-center justify-center px-4 py-3 text-sm rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all shadow-sm">
+              <button
+                className="flex-1 flex items-center justify-center px-4 py-3 text-sm rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 transition-all shadow-sm"
+                onClick={handleAdvance}
+                disabled={isBotTyping || chatHistory.length === 0}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-4 w-4 mr-2"

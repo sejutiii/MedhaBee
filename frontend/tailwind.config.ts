@@ -8,7 +8,33 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        display: [
+          'Geist',
+          'Inter',
+          'Space Grotesk',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
+        ],
+        mono: [
+          'Geist Mono',
+          'JetBrains Mono',
+          'ui-monospace',
+          'SFMono-Regular',
+          'monospace',
+        ],
+        body: [
+          'Inter',
+          'Geist',
+          'Space Grotesk',
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
+        ],
+      },
+    },
   },
   plugins: [],
 };
