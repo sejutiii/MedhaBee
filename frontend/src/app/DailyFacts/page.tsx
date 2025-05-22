@@ -104,7 +104,7 @@ export default function FactsPage() {
 						<Link href="/" className="text-xl font-bold text-blue-600 flex items-center">MedhaBee</Link>
 						<nav className="hidden md:flex space-x-8">
 							<Link href="/" className="text-gray-600 hover:text-blue-600">Home</Link>
-							<Link href="/chat" className="text-gray-600 hover:text-blue-600">Chat</Link>
+							<Link href="/chatbot" className="text-gray-600 hover:text-blue-600">Chat</Link>
 							<Link href="/DailyFacts" className="text-blue-600 font-medium">Daily Facts</Link>
 							<Link href="/videos" className="text-gray-600 hover:text-blue-600">Videos</Link>
 						</nav>

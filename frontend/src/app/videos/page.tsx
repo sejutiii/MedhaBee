@@ -159,7 +159,15 @@ export default function VideosPage() {
               {["Home", "Chat", "DailyFacts", "Videos"].map((item) => (
                 <Link
                   key={item}
-                  href={item === "Home" ? "/" : `/${item.toLowerCase()}`}
+                  href={
+                  item === "Home"
+                    ? "/"
+                    : item === "DailyFacts"
+                    ? "/DailyFacts"
+                    : item === "Chat"
+                    ? "/chatbot"
+                    : `/${item.toLowerCase()}`
+                  }
                   className={`font-medium ${item === "Videos" ? "text-blue-600 border-b-2 border-blue-600 pb-1" : "text-gray-600 hover:text-blue-600"}`}
                 >
                   {item}
@@ -176,9 +184,7 @@ export default function VideosPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </button>
-            <Link href="/login" className="px-3 py-1 text-blue-600 border border-blue-600 rounded hover:bg-blue-50">Log In</Link>
-            <Link href="/signup" className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Sign Up</Link>
-          </div>
+            </div>
         </div>
       </header>
 
@@ -321,18 +327,6 @@ export default function VideosPage() {
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-          <span className="text-gray-500 mb-4 md:mb-0">© 2025 MedhaBee. All rights reserved.</span>
-          <div className="flex gap-6">
-            {["About", "Privacy", "Terms", "Contact"].map((item) => (
-              <a key={item} href="#" className="text-gray-600 hover:text-blue-600">{item}</a>
-            ))}
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

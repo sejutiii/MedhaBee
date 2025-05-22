@@ -8,7 +8,7 @@ type FeatureCardProps = {
   description: string;
 };
 
-export default function FeatureCard({ icon, title, description }: FeatureCardProps) {
+export default function FeatureCard({ icon, title, description, children }: FeatureCardProps & { children?: React.ReactNode }) {
   return (
     <div>
         <Card className="hover:shadow-lg transition-shadow">
@@ -19,6 +19,7 @@ export default function FeatureCard({ icon, title, description }: FeatureCardPro
         </CardHeader>
         <CardContent className="text-center text-gray-600">
             {description}
+            {children && <div className="mt-4">{children}</div>}
         </CardContent>
         </Card>
     </div>
