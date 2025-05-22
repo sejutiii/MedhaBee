@@ -1,8 +1,11 @@
 fastapi 
-uvicorn 
+uvicorn[standard] 
 pymongo 
 python-dotenv
 python-jose[cryptography]
 google-generativeai
 google-api-python-client 
 requests
+azure-cognitiveservices-speech
+python-multipart
+ffmpeg-python
