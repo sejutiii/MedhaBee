@@ -160,7 +160,7 @@ We welcome contributions! Please follow these steps:
 5. Open a Pull Request.
 
 
-## Team
+## Contributors
 - **Sejuti Sharmin Siddiqui** - The University of Dhaka
 - **Farhan Tausif** - The University of Dhaka
 - **Mahdiya Rahman Sukanya** - The University of Dhaka
@@ -168,4 +168,3 @@ We welcome contributions! Please follow these steps:
 ## Acknowledgments
 - **BRAC-Biggan Adda** for hosting the 1st SN Bose National Science Festival 2025 IT Hackathon.
 - **The University of Dhaka** for supporting our team.
-- Built with ❤️ by **Status_Code 418**.
